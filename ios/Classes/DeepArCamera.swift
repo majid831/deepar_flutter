@@ -121,7 +121,9 @@ class DeepARCameraView: NSObject, FlutterPlatformView, DeepARDelegate {
             
         case "switchEffectWithSlot":
             let slot:String = args?["slot"] as! String
-            let path:String = args?["path"] as! String
+                        let effect:String = args?["path"] as! String
+            let key = registrar?.lookupKey(forAsset: effect)
+            let path = Bundle.main.path(forResource: key, ofType: nil)
             let face = args?["face"] as! Int
             let targetGameObject = args?["targetGameObject"] as? String
             let isGameTargetEmpty = String.isNilOrEmpty(string: targetGameObject)
