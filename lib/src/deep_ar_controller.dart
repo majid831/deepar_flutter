@@ -14,12 +14,15 @@ class DeepArController {
   late final DeepArPlatformHandler _deepArPlatformHandler;
   late final Resolution _resolution;
 
+  Map<int, String> _lastAppliedEffects = {};
+
   int? _textureId;
   Size? _imageSize;
   double? _aspectRatio;
   bool _hasPermission = false;
   String? _iosLicenseKey;
   bool _isRecording = false;
+  bool _faceVisible = false;
 
   CameraDirection _cameraDirection = CameraDirection.front;
   bool _flashState = false;
@@ -46,6 +49,8 @@ class DeepArController {
 
   ///Get current flash state as [FlashState.on] or [FlashState.off]
   bool get flashState => _flashState;
+
+  bool get isFaceVisible => _faceVisible;
 
   ///Size of the preview image
   ///
@@ -193,6 +198,10 @@ class DeepArController {
       required String path,
       String? targetGameObject,
       int? face}) async {
+    if (path != "none") {
+      int slotNumber = int.parse(slot.replaceAll("effect_", ""));
+      _lastAppliedEffects[slotNumber] = path; // ✅ Store last effect
+    }
     await platformRun(
         androidFunction: () =>
             _deepArPlatformHandler.switchEffectWithSlot(slot: slot, path: path),
@@ -339,6 +348,28 @@ class DeepArController {
   void _setNativeListenerIos() {
     try {
       _deepArPlatformHandler.setListenerIos(_textureId!);
+
+      _deepArPlatformHandler.faceVisibilityStream.listen((isVisible) {
+        _faceVisible = isVisible; // ✅ Notify UI
+
+        if (!isVisible) {
+          debugPrint("Face lost! Removing effects...");
+          debugPrint(_lastAppliedEffects.toString());
+          debugPrint("Face lost! Removing effects...");
+          _lastAppliedEffects.forEach((slot, _) {
+            switchEffectWithSlot(
+                slot: "effect_$slot", path: "none"); // Remove effect
+          });
+        } else {
+          debugPrint("Face detected! Reapplying effects...");
+          debugPrint(_lastAppliedEffects.toString());
+          debugPrint("Face detected! Reapplying effects...");
+          _lastAppliedEffects.forEach((slot, path) {
+            switchEffectWithSlot(
+                slot: "effect_$slot", path: path); // ✅ Reapply effect
+          });
+        }
+      });
     } catch (e) {
       debugPrint(
           "Exception while setting iOS response listener, won't be able to notify flutter once files are available");

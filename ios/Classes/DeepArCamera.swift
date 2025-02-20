@@ -276,6 +276,13 @@ class DeepARCameraView: NSObject, FlutterPlatformView, DeepARDelegate {
         
         return false // flash OFF
     }
+
+    func faceVisiblityDidChange(_ faceVisible: Bool) {
+         DispatchQueue.main.async {
+             let args: [String: Any] = ["caller": "face_visibility", "visible": faceVisible]
+             self.channel.invokeMethod("on_face_visibility", arguments: args)
+         }
+     }
     
     
     func startRecordingVideo(){

@@ -23,6 +23,10 @@ class DeepArPlatformHandler {
   static ScreenshotResponse? _screenshotResponse;
   static String? _screenshotFilePath;
 
+  StreamController<bool> _faceVisibilityController =
+      StreamController<bool>.broadcast();
+  Stream<bool> get faceVisibilityStream => _faceVisibilityController.stream;
+
   DeepArPlatformHandler() {
     if (Platform.isAndroid) {
       _channel.setMethodCallHandler(listenFromNativeMethodHandler);
@@ -59,6 +63,11 @@ class DeepArPlatformHandler {
           _screenshotFilePath = null;
         }
 
+        break;
+
+      case "on_face_visibility":
+        bool isVisible = data['visible'] ?? false;
+        _faceVisibilityController.add(isVisible); // Emit visibility event
         break;
       default:
         debugPrint('no method handler for method ${call.method}');
