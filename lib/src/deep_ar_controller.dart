@@ -351,28 +351,6 @@ class DeepArController {
   void _setNativeListenerIos() {
     try {
       _deepArPlatformHandler.setListenerIos(_textureId!);
-
-      _deepArPlatformHandler.faceVisibilityStream.listen((isVisible) {
-        _faceVisible = isVisible; // ✅ Notify UI
-
-        if (!isVisible) {
-          debugPrint("Face lost! Removing effects...");
-          debugPrint(_lastAppliedEffects.toString());
-          debugPrint("Face lost! Removing effects...");
-          _lastAppliedEffects.forEach((slot, _) {
-            switchEffectWithSlot(
-                slot: "effect_$slot", path: "none"); // Remove effect
-          });
-        } else {
-          debugPrint("Face detected! Reapplying effects...");
-          debugPrint(_lastAppliedEffects.toString());
-          debugPrint("Face detected! Reapplying effects...");
-          _lastAppliedEffects.forEach((slot, path) {
-            switchEffectWithSlot(
-                slot: "effect_$slot", path: path); // ✅ Reapply effect
-          });
-        }
-      });
     } catch (e) {
       debugPrint(
           "Exception while setting iOS response listener, won't be able to notify flutter once files are available");
