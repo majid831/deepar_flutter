@@ -424,8 +424,14 @@ public class DeepArPlugin implements FlutterPlugin, AREventListener, ActivityAwa
     }
 
     @Override
-    public void faceVisibilityChanged(boolean b) {
-
+    public void faceVisibilityChanged(boolean isVisible) {
+        // Create a map to pass the face visibility status to Flutter
+        Map<String, Object> map = new HashMap<>();
+        map.put("caller", "face_visibility");
+        map.put("visible", isVisible);  // true or false for face visibility
+        
+        // Invoke the method channel to send the data to Flutter
+        channel.invokeMethod("on_face_visibility", map);
     }
 
     @Override
