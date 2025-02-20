@@ -31,6 +31,9 @@ class DeepArController {
     _deepArPlatformHandler = DeepArPlatformHandler();
   }
 
+  Stream<bool> get faceVisibilityStream =>
+      _deepArPlatformHandler.faceVisibilityStream;
+
   ///Return true if the camera preview is initialized
   ///
   ///For [iOS], please call the function after [DeepArPreview] widget has been built.
